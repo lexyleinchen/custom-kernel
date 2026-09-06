@@ -1,0 +1,296 @@
+# PRINTOS CUSTOM NON-COMMERCIAL LICENSE (PCNCL)
+
+## Version 1.0
+
+Copyright (c) 2026 lexyleinchen
+
+---
+
+## IMPORTANT NOTICE
+
+This is a custom license and is not an OSI-approved open-source license.
+
+It is intentionally restrictive and is provided specifically for the PrintOS project.
+
+By obtaining, copying, modifying, using, distributing, or creating a Derivative Work from the Software, you agree to the terms of this license.
+
+---
+
+## 1. DEFINITIONS
+
+**"Software"** means the PrintOS kernel, PrintOS operating system components, source code, binaries, build files, documentation, assets, and other material included in this repository that is owned by the Author.
+
+**"Author"** means lexyleinchen, the original creator and copyright holder of the Software.
+
+**"Derivative Work"** means any modification, adaptation, port, extension, integration, fork, or other work that incorporates, contains, or is substantially based on any part of the Software.
+
+A work does not become a Derivative Work merely because it communicates with, runs alongside, or independently interacts with PrintOS without incorporating Software code.
+
+**"Written Permission"** means explicit permission provided by the Author in a physical written document personally signed by the Author.
+
+Emails, online messages, comments, Discord messages, GitHub comments, verbal statements, or other electronic communications do not constitute Written Permission for purposes of this license.
+
+---
+
+## 2. COPYRIGHT
+
+The Software and all original material contained within this repository remain the intellectual property of the Author.
+
+All rights not expressly granted by this license are reserved by the Author.
+
+Nothing in this license transfers ownership of the Software to any other person or organization.
+
+---
+
+## 3. CREDIT REQUIREMENT
+
+Any permitted use, publication, distribution, demonstration, modification, fork, or Derivative Work must provide clear and visible credit to the Author.
+
+The credit must identify:
+
+**Author: lexyleinchen**
+
+and must identify the work as using, incorporating, or being based on PrintOS and/or its kernel where applicable.
+
+Credit must not be removed, hidden, altered to mislead others, or falsely attributed.
+
+---
+
+## 4. NON-COMMERCIAL LICENSE
+
+The Software and all Derivative Works are provided solely for personal, educational, experimental, research, and other non-commercial purposes.
+
+You may not sell, license for payment, rent, lease, sublicense, monetize, commercially distribute, commercially exploit, or otherwise use the Software or a Derivative Work for commercial purposes without the Author's prior Written Permission.
+
+This restriction applies equally to:
+
+* the original Software;
+* forks;
+* modified versions;
+* ports;
+* extensions;
+* operating systems based on the Software;
+* kernels based on the Software;
+* applications incorporating Software code;
+* products incorporating Software code; and
+* other Derivative Works.
+
+---
+
+## 5. COMMERCIAL USE REQUIRES PHYSICAL SIGNED PERMISSION
+
+Commercial use of the Software or any Derivative Work requires prior Written Permission from the Author.
+
+Such permission must:
+
+* be provided in a physical written document;
+* be personally signed by the Author;
+* explicitly authorize the intended commercial use; and
+* be obtained before the commercial activity begins.
+
+No commercial rights are granted merely because the Software is publicly available, including on GitHub.
+
+Without such Written Permission, commercial use is prohibited.
+
+---
+
+## 6. MODIFICATIONS AND DERIVATIVE WORKS
+
+You may study, modify, fork, extend, port, and create Derivative Works from the Software solely for permitted non-commercial purposes.
+
+Every Derivative Work must:
+
+* remain subject to this license;
+* be distributed under the PCNCL;
+* include a complete copy of this license;
+* retain all original copyright notices;
+* provide clear and visible credit to the Author;
+* remain non-commercial;
+* comply with Section 7 (Artificial Intelligence Prohibition); and
+* preserve all restrictions contained in this license.
+
+A fork of the Software is a Derivative Work and is therefore subject to this license.
+
+You may not relicense a Derivative Work under another license without the Author's prior Written Permission.
+
+You may not remove this license from a Derivative Work.
+
+---
+
+## 7. ARTIFICIAL INTELLIGENCE PROHIBITION
+
+The Author expressly prohibits the use of artificial intelligence systems in connection with the Software or any Derivative Work.
+
+You may not submit, upload, paste, transmit, expose, or otherwise provide any portion of the Software or a Derivative Work to an artificial intelligence system for:
+
+* analysis;
+* explanation;
+* debugging;
+* modification;
+* rewriting;
+* optimization;
+* completion;
+* translation;
+* code generation;
+* code review;
+* code suggestions; or
+* any other form of AI processing.
+
+You may not:
+
+* submit the source code to AI chatbots;
+* ask an AI system questions about the source code;
+* upload repository files to AI services;
+* use AI coding assistants on the project;
+* use AI to generate code for the project;
+* use AI-generated code in the project;
+* use AI-generated code in a Derivative Work;
+* use AI-assisted generated code as a contribution;
+* use AI to modify existing project code; or
+* provide substantial portions of the Software to an AI system for any purpose.
+
+All forks and Derivative Works must comply with these restrictions.
+
+The Software and all permitted Derivative Works must remain entirely human-written and must not contain AI-generated source code.
+
+---
+
+## 8. CONTRIBUTIONS
+
+Any contribution to the Software or a Derivative Work must comply with this license.
+
+By submitting a contribution, the contributor represents that the submitted code was written entirely by the contributor without the use of generative AI or AI coding assistants.
+
+Contributors may not submit:
+
+* AI-generated code;
+* AI-modified code;
+* AI-assisted generated code;
+* code generated by AI coding assistants; or
+* code produced through any other generative AI system.
+
+The Author may reject any contribution if the Author determines that it does not comply with this requirement.
+
+---
+
+## 9. REDISTRIBUTION AND FORKS
+
+Redistribution and forking are permitted only for non-commercial purposes and only while all terms of this license are preserved.
+
+Any redistribution or fork must:
+
+* include this license in its entirety;
+* retain all original copyright notices;
+* provide clear and visible credit to lexyleinchen;
+* remain subject to the PCNCL;
+* comply with the Artificial Intelligence Prohibition;
+* remain non-commercial; and
+* not grant rights broader than those granted by this license.
+
+A fork may not be converted into a differently licensed project without the Author's prior Written Permission.
+
+A fork may not be sold, monetized, commercially licensed, or commercially exploited without the Author's prior Written Permission.
+
+---
+
+## 10. DERIVATIVE PRODUCTS AND PROJECTS
+
+Any product, operating system, kernel, application, service, software project, or other work that incorporates Software code or is substantially based on the Software is a Derivative Work and is subject to this license.
+
+Such Derivative Works must:
+
+* remain under the PCNCL;
+* provide credit to lexyleinchen;
+* remain non-commercial;
+* contain no AI-generated code;
+* comply with the Artificial Intelligence Prohibition; and
+* retain the restrictions of this license.
+
+The use of a different name, repository, programming language, architecture, or build system does not by itself remove a work from the scope of this license.
+
+---
+
+## 11. NO BYPASSING THE LICENSE
+
+You may not intentionally avoid, circumvent, weaken, or bypass the restrictions of this license.
+
+This includes attempting to avoid the license by:
+
+* renaming the Software;
+* moving the Software to another repository;
+* creating a fork;
+* substantially modifying the source code;
+* translating or rewriting the Software;
+* combining the Software with other software;
+* distributing only compiled binaries;
+* incorporating the Software into another operating system, kernel, application, or product;
+* removing copyright notices;
+* removing this license;
+* claiming that a modified version is sufficiently different solely to avoid this license; or
+* otherwise attempting to circumvent the requirements of this license.
+
+If a work qualifies as a Derivative Work under Section 1, the restrictions of this license continue to apply.
+
+---
+
+## 12. NO WARRANTY
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED.
+
+THE AUTHOR SHALL NOT BE LIABLE FOR ANY DAMAGE, LOSS, DATA LOSS, HARDWARE DAMAGE, SOFTWARE DAMAGE, OR OTHER CONSEQUENCES ARISING FROM THE USE, MODIFICATION, DISTRIBUTION, OR INABILITY TO USE THE SOFTWARE.
+
+---
+
+## 13. TERMINATION
+
+Any rights granted under this license automatically terminate if you violate any term of this license.
+
+Upon termination, you must cease use and distribution of the Software and any unauthorized Derivative Works.
+
+Termination does not remove or extinguish any rights or remedies the Author may have under applicable law.
+
+---
+
+## 14. RESERVATION OF RIGHTS
+
+The Author reserves all rights not expressly granted by this license.
+
+This includes all rights relating to:
+
+* copyright;
+* commercial licensing;
+* distribution;
+* derivative works;
+* future versions;
+* trademarks and project names, where applicable; and
+* other intellectual-property rights belonging to the Author.
+
+The Author may separately grant additional rights to specific individuals or organizations through Written Permission.
+
+---
+
+## 15. CHANGES TO THIS LICENSE
+
+Future versions of the Software may be released under updated versions of this license.
+
+Unless explicitly stated otherwise, the license included with a particular release governs that release.
+
+A later version of this license does not automatically change the license applicable to previously released versions.
+
+---
+
+## 16. AI DISCLOSURE
+
+This license was drafted with assistance from an artificial intelligence system.
+
+The Software itself is **100% human-written**.
+
+The Software's source code was written entirely by the Author without the use of generative artificial intelligence, AI coding assistants, or AI-generated code.
+
+No AI-generated source code has been used in the Software.
+
+The AI assistance used to draft this license does not grant any rights to the Software beyond those expressly provided by this license.
+
+---
+
+# END OF LICENSE
