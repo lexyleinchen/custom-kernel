@@ -6,6 +6,7 @@ extern "C" {
 #endif
 
 void os_init(void);
+
 void os_draw(void);
 
 #ifdef __cplusplus

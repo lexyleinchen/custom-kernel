@@ -24,6 +24,13 @@ SECTIONS
         *(.data)
     }
 
+    .apps ALIGN(8) : SUBALIGN(8)
+    {
+        __app_start = .;
+        KEEP(*(.apps))
+        __app_end = .;
+    }
+
     .bss :
     {
         *(COMMON)

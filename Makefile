@@ -4,6 +4,9 @@ CC = $(TARGET)-gcc
 CXX = $(TARGET)-g++
 LD = $(TARGET)-ld
 AS = nasm
+APP_DIRS := $(wildcard src/apps/*)
+APP_SOURCES := $(foreach dir,$(APP_DIRS),$(wildcard $(dir)/*.cpp))
+APP_OBJECTS := $(patsubst src/%.cpp,build/%.o,$(APP_SOURCES))
 
 CFLAGS = -ffreestanding \
 	-fno-stack-protector \
@@ -71,11 +74,12 @@ build/font.o: src/os/font.cpp | build
 build/taskbar.o: src/os/taskbar.cpp | build
 	$(CXX) $(CXXFLAGS) -Isrc/os -c $< -o $@
 
-build/terminal.o: src/os/terminal.cpp | build
-	$(CXX) $(CXXFLAGS) -Isrc/os -c $< -o $@
-
 build/os_mouse.o: src/os/os_mouse.cpp | build
 	$(CXX) $(CXXFLAGS) -Isrc/os -c $< -o $@
+
+build/%.o: src/%.cpp
+	mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) -Isrc/os -Isrc/kernel -Isrc/apps -c $< -o $@
 
 $(KERNEL): build/boot.o \
 		build/kernel.o \
@@ -91,8 +95,8 @@ $(KERNEL): build/boot.o \
 		build/ui.o \
 		build/font.o \
 		build/taskbar.o \
-		build/terminal.o \
-		build/os_mouse.o
+		build/os_mouse.o \
+		$(APP_OBJECTS)
 	$(LD) $(LDFLAGS) -o $@ $^
 
 iso: $(KERNEL)
