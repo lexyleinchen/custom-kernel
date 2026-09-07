@@ -25,6 +25,8 @@ void ps2_mouse_poll(void);
 
 int mouse_left_clicked(void);
 
+int mouse_left_pressed(void);
+
 int mouse_right_clicked(void);
 
 int mouse_middle_clicked(void);

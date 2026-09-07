@@ -3,8 +3,8 @@
 #include "taskbar.h"
 #include "os_mouse.h"
 #include "app_registry.h"
-
 #include "font.h"
+#include "ui.h"
 
 #include "../kernel/framebuffer.h"
 #include "../kernel/log.h"
@@ -35,12 +35,9 @@ void os_init(void) {
 
 extern "C"
 void os_draw(void) {
-    graphics_clear(0x377c82FF); // Clear the screen with a color (blue)
-    
-    for (int i = 0; i < app_count(); i++) {
-        app_get(i)->draw();
-    }
-
+    graphics_clear(0xFF377c82); // Clear the screen with a color (blue)
+    ui_update_windows();
+    ui_draw_windows();
     taskbar_draw();
     mouse_draw();
     graphics_present();

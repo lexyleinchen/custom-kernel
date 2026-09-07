@@ -8,10 +8,6 @@ namespace calculator {
     void init() {
 
     }
-
-    void draw() {
-        font_draw_text(100, 500, "Calculator", 0xFFFFFFFF);
-    }
 }
 
 REGISTER_APP(calculator);

@@ -27,8 +27,7 @@ static inline const App* app_get(int index) {
     __attribute__((used, section(".apps"))) \
     static const App __app_##name = { \
         #name, \
-        name::init, \
-        name::draw \
+        name::init \
     };
 
 #endif // APP_REGISTRY_H

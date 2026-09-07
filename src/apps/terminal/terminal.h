@@ -4,8 +4,6 @@
 namespace terminal {
     void init();
 
-    void draw();
-
     void write(const char* text);
 }
 

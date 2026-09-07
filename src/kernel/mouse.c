@@ -192,6 +192,10 @@ int mouse_left_clicked(void) {
     return 0;
 }
 
+int mouse_left_pressed(void) {
+    return (mouse_state.buttons & 0x01) != 0;
+}
+
 int mouse_right_clicked(void) {
     if (mouse_clicked_buttons & 0x02) {
         mouse_clicked_buttons &= ~0x02;

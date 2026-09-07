@@ -3,8 +3,6 @@
 
 namespace calculator {
     void init();
-
-    void draw();
 }
 
 #endif // CALCULATOR_H

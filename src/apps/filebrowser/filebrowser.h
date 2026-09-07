@@ -3,8 +3,6 @@
 
 namespace filebrowser {
     void init();
-
-    void draw();
 }
 
 #endif // FILEBROWSER_H
