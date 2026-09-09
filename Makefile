@@ -35,25 +35,40 @@ build:
 build/kernel.o: src/kernel/kernel.c | build
 	$(CC) $(CFLAGS) -Isrc/kernel -Isrc/os -c $< -o $@
 
-build/log.o: src/kernel/log.c | build
+build/log.o: src/kernel/core/log.c | build
 	$(CC) $(CFLAGS) -Isrc/kernel -c $< -o $@
 
-build/framebuffer.o: src/kernel/framebuffer.c | build
+build/framebuffer.o: src/kernel/framebuffer/framebuffer.c | build
 	$(CC) $(CFLAGS) -Isrc/kernel -c $< -o $@
 
-build/multiboot.o: src/kernel/multiboot.c | build
+build/block.o: src/kernel/storage/block.c | build
 	$(CC) $(CFLAGS) -Isrc/kernel -c $< -o $@
 
-build/ps2.o: src/kernel/ps2.c | build
+build/storage.o: src/kernel/storage/storage.c | build
 	$(CC) $(CFLAGS) -Isrc/kernel -c $< -o $@
 
-build/pci.o: src/kernel/pci.c | build
+build/partition.o: src/kernel/storage/partition/partition.c | build
 	$(CC) $(CFLAGS) -Isrc/kernel -c $< -o $@
 
-build/usb.o: src/kernel/usb.c | build
+build/multiboot.o: src/kernel/boot/multiboot.c | build
 	$(CC) $(CFLAGS) -Isrc/kernel -c $< -o $@
 
-build/mouse.o: src/kernel/mouse.c | build
+build/ps2.o: src/kernel/drivers/ps2/ps2.c | build
+	$(CC) $(CFLAGS) -Isrc/kernel -c $< -o $@
+
+build/pci.o: src/kernel/drivers/pci/pci.c | build
+	$(CC) $(CFLAGS) -Isrc/kernel -c $< -o $@
+
+build/usb.o: src/kernel/drivers/usb/usb.c | build
+	$(CC) $(CFLAGS) -Isrc/kernel -c $< -o $@
+
+build/ahci.o: src/kernel/drivers/ahci/ahci.c | build
+	$(CC) $(CFLAGS) -Isrc/kernel -c $< -o $@
+
+build/ide.o: src/kernel/drivers/ide/ide.c | build
+	$(CC) $(CFLAGS) -Isrc/kernel -c $< -o $@
+
+build/mouse.o: src/kernel/inputs/mouse.c | build
 	$(CC) $(CFLAGS) -Isrc/kernel -c $< -o $@
 
 build/boot.o: src/boot/boot.asm | build
@@ -85,10 +100,15 @@ $(KERNEL): build/boot.o \
 		build/kernel.o \
 		build/log.o \
 		build/framebuffer.o \
+		build/block.o \
+		build/storage.o \
+		build/partition.o \
 		build/multiboot.o \
 		build/ps2.o \
 		build/pci.o \
 		build/usb.o \
+		build/ahci.o \
+		build/ide.o \
 		build/mouse.o \
 		build/os.o \
 		build/graphics.o \

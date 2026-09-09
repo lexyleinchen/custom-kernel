@@ -6,9 +6,9 @@
 #include "font.h"
 #include "ui.h"
 
-#include "../kernel/framebuffer.h"
-#include "../kernel/log.h"
-#include "../kernel/mouse.h"
+#include "../kernel/framebuffer/framebuffer.h"
+#include "../kernel/core/log.h"
+#include "../kernel/inputs/mouse.h"
 
 extern "C"
 void os_init(void) {

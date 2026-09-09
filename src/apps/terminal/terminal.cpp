@@ -4,19 +4,15 @@
 #include "../../os/font.h"
 #include "../../os/ui.h"
 
-#include "../../kernel/log.h"
+#include "../../kernel/core/log.h"
 
 namespace terminal {
     static Window window;
     static int scroll_line = 0;
-    static int scroll_direction = 1;
-    static int scroll_delay = 0;
-    static int end_dalay = 0;
     static int terminal_width = 800;
     static int terminal_height = 450;
-
-    #define SCROLL_SPEED 20
-    #define END_WAIT 240 // 240 frames = ~4 second when 60fps
+    static int previous_log_count = 0;
+    static int previous_max_scroll = 0;
 
     static void draw_content(Window* window) {
         int content_x = ui_window_content_x(window);
@@ -31,46 +27,25 @@ namespace terminal {
             return;
         }
 
+        int scrollbar_x = content_x + content_width - 10;
         int max_lines = (content_height - 15) / 16;
-        int max_scroll = count - max_lines;
         
         if (max_lines < 1) {
-            max_scroll = 1;
+            max_lines = 1;
         }
+
+        int max_scroll = count - max_lines;
 
         if (max_scroll < 0) {
             max_scroll = 0;
         }
 
-        if (max_scroll > 0) {
-            if (end_dalay > 0) {
-                end_dalay--;
-            }
-            else {
-                scroll_delay++;
-
-                if (scroll_delay >= 20) {
-                    scroll_delay = 0;
-                    scroll_line += scroll_direction;
-
-                    if (scroll_line >= max_scroll) {
-                        scroll_line = max_scroll;
-                        scroll_direction = -1;
-                        end_dalay = END_WAIT;
-                    }
-
-                    if (scroll_line <= 0) {
-                        scroll_line = 0;
-                        scroll_direction = 1;
-                        end_dalay = END_WAIT;
-                    }
-                }
-            }
-        }
-        else {
+        if (scroll_line < 0) {
             scroll_line = 0;
-            scroll_delay = 0;
-            end_dalay = 0;
+        }
+
+        if (scroll_line > max_scroll) {
+            scroll_line = max_scroll;
         }
 
         int y = text_y;
@@ -97,16 +72,68 @@ namespace terminal {
 
             y += 16;
         }
+
+        draw_scrollbar(scrollbar_x, content_y, 10, content_height, count, max_lines, scroll_line);
+    }
+
+    static void update_content(Window* window) {
+        int content_x = ui_window_content_x(window);
+        int content_y = ui_window_content_y(window);
+        int content_width = ui_window_content_width(window);
+        int content_height = ui_window_content_height(window);
+        int max_lines = (content_height - 15) / 16;
+
+        if (max_lines < 1) {
+            max_lines = 1;
+        }
+
+        int count = log_count();
+        int max_scroll = count - max_lines;
+
+        if (max_scroll < 0) {
+            max_scroll = 0;
+        }
+
+        bool was_at_bottom = scroll_line >= previous_max_scroll;
+
+        if ((count > previous_log_count) && was_at_bottom) {
+            scroll_line = max_scroll;
+        }
+
+        previous_log_count = count;
+        previous_max_scroll = max_scroll;
+
+        if (scroll_line < 0) {
+            scroll_line = 0;
+        }
+
+        if (scroll_line > max_scroll) {
+            scroll_line = max_scroll;
+        }
+
+        update_scrollbar(window, content_x + content_width - 10, content_y, 10, content_height, count, max_lines, scroll_line);
     }
 
     void init() {
-        scroll_line = 0;
-        scroll_direction = 1;
-        scroll_delay = 0;
-        end_dalay = 0;
-
-        window = ui_create_window(10, 10, terminal_width, terminal_height, "Terminal", 0xFF000000, 0xFF808080, 0xFFFFFFFF, draw_content);
+        window = ui_create_window(10, 10, terminal_width, terminal_height, "Terminal", 0xFF000000, 0xFF808080, 0xFFFFFFFF, update_content, draw_content);
         ui_register_window(&window);
+        int content_height = ui_window_content_height(&window);
+        int max_lines = (content_height - 15) / 16;
+
+        if (max_lines < 1) {
+            max_lines = 1;
+        }
+
+        int count = log_count();
+        int max_scroll = count - max_lines;
+
+        if (max_scroll < 0) {
+            max_scroll = 0;
+        }
+
+        scroll_line = max_scroll;
+        previous_log_count = count;
+        previous_max_scroll = max_scroll;
     }
 }
 

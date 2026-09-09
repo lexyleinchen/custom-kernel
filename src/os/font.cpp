@@ -266,7 +266,7 @@ static const uint8_t font_5[5] = {
 };
 
 static const uint8_t font_6[5] = {
-    0b11111,
+    0b11110,
     0b10000,
     0b11110,
     0b10001,
@@ -452,4 +452,29 @@ void font_draw_text(int x, int y, const char* text, uint32_t color) {
         current_x += 14; // Move to the next character position (5 pixels + 2 pixels spacing)
         text++;
     }
+}
+
+void font_draw_number(int x, int y, uint32_t number, uint32_t color) {
+    char buffer[16];
+    int position = 0;
+
+    if (number == 0) {
+        buffer[position++] = '0';
+    }
+    else {
+        char reversed[16];
+        int count = 0;
+
+        while (number > 0 && count < 15) {
+            reversed[count++] = '0' + (number % 10);
+            number /= 10;
+        }
+
+        while (count > 0) {
+            buffer[position++] = reversed[--count];
+        }
+    }
+
+    buffer[position] = '\0';
+    font_draw_text(x, y, buffer, color);
 }

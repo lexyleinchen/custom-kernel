@@ -2,11 +2,12 @@
 #include "graphics.h"
 #include "font.h"
 
-#include "../kernel/mouse.h"
+#include "../kernel/inputs/mouse.h"
 
 #define WINDOW_TITLE_BAR_HEIGHT 26
 #define WINDOW_BORDER_SIZE 1
 #define MAX_WINDOWS 32
+#define SCROLLBAR_MIN_HEIGHT 20
 
 static Window* windows[MAX_WINDOWS];
 static int window_count;
@@ -37,7 +38,7 @@ bool graphics_button(int x, int y, int width, int height, uint32_t color, const 
     return hoverd && mouse_left_clicked();
 }
 
-Window ui_create_window(int x, int y, int width, int height, const char* title,uint32_t background_color, uint32_t title_bar_color, uint32_t title_color, WindowDrawCallback draw_content) {
+Window ui_create_window(int x, int y, int width, int height, const char* title,uint32_t background_color, uint32_t title_bar_color, uint32_t title_color, WindowUpdateCallback update_content, WindowDrawCallback draw_content) {
     Window window;
     window.x = x;
     window.y = y;
@@ -47,9 +48,12 @@ Window ui_create_window(int x, int y, int width, int height, const char* title,u
     window.dragging = false;
     window.drag_offset_x = 0;
     window.drag_offset_y = 0;
+    window.scrollbar.dragging = false;
+    window.scrollbar.drag_offset = 0;
     window.background_color = background_color;
     window.title_bar_color = title_bar_color;
     window.title_color = title_color;
+    window.update_content = update_content;
     window.draw_content = draw_content;
     return window;
 }
@@ -165,22 +169,32 @@ void ui_update_windows() {
     MouseState mouse;
     mouse_get_state(&mouse);
 
-    if (focused_window != nullptr && focused_window->dragging) {
+    if (focused_window != nullptr && focused_window->scrollbar.dragging) {
         ui_update_window(focused_window, true);
-        return;
+    }
+    else if (focused_window != nullptr && focused_window->dragging) {
+        ui_update_window(focused_window, true);
+    }
+    else {
+        Window* active_window = ui_get_window_at(mouse.x, mouse.y);
+
+        if (active_window != nullptr && mouse_left_pressed()) {
+            focused_window = active_window;
+            ui_bring_to_front(active_window);
+            ui_update_window(focused_window, true);
+        }
     }
 
-    Window* active_window = ui_get_window_at(mouse.x, mouse.y);
+    for (int i = 0; i < window_count; i++) {
+        Window* window = windows[i];
 
-    if (active_window != nullptr && mouse_left_clicked()) {
-        focused_window = active_window;
-        ui_bring_to_front(active_window);
-        ui_update_window(focused_window, true);
-        return;
-    }
+        if (window == nullptr) {
+            continue;
+        }
 
-    if (focused_window != nullptr) {
-        ui_update_window(focused_window, true);
+        if (window->update_content != nullptr) {
+            window->update_content(window);
+        }
     }
 }
 
@@ -227,4 +241,116 @@ int ui_window_content_width(const Window* window) {
 
 int ui_window_content_height(const Window* window) {
     return window->height - WINDOW_TITLE_BAR_HEIGHT;
+}
+
+void draw_scrollbar(int x, int y, int width, int height, int total_lines, int visible_lines, int scroll) {
+    if (total_lines <= visible_lines) {
+        return;
+    }
+
+    graphics_rectangle(x, y, width, height, 0xFF202020);
+
+    int thumb_height = (visible_lines * height) / total_lines;
+
+    if (thumb_height < SCROLLBAR_MIN_HEIGHT) {
+        thumb_height = SCROLLBAR_MIN_HEIGHT;
+    }
+
+    if (thumb_height > height) {
+        thumb_height = height;
+    }
+
+    int max_scroll = total_lines - visible_lines;
+    int max_thumb_y = height - thumb_height;
+    int thumb_y = y;
+
+    if (max_scroll > 0) {
+        thumb_y += (scroll * max_thumb_y) / max_scroll;
+    }
+
+    graphics_rectangle(x + 2, thumb_y, width - 4, thumb_height, 0xFF606060);
+}
+
+void update_scrollbar(Window* window, int x, int y , int width, int height, int total_lines, int visible_lines, int& scroll) {
+    if (total_lines <= visible_lines) {
+        window->scrollbar.dragging = false;
+        scroll = 0;
+        return;
+    }
+
+    MouseState mouse;
+    mouse_get_state(&mouse);
+    int max_scroll = total_lines - visible_lines;
+    int thumb_height = (visible_lines * height) / total_lines;
+
+    if (thumb_height < SCROLLBAR_MIN_HEIGHT) {
+        thumb_height = SCROLLBAR_MIN_HEIGHT;
+    }
+
+    if (thumb_height > height) {
+        thumb_height = height;
+    }
+
+    int max_thumb_y = height - thumb_height;
+    int thumb_y = y;
+
+    if (max_scroll > 0) {
+        thumb_y += (scroll * max_thumb_y) / max_scroll;
+    }
+
+    bool mouse_in_thumb = mouse.x >= x && mouse.x < x + width && mouse.y >= thumb_y && mouse.y < thumb_y + thumb_height;
+    bool mouse_in_scrollbar = mouse.x >= x && mouse.x < x + width && mouse.y >= y && mouse.y < y + height;
+
+    if (!window->scrollbar.dragging && mouse_left_pressed() && mouse_in_thumb) {
+        window->scrollbar.dragging = true;
+        window->scrollbar.drag_offset = mouse.y - thumb_y;
+    }
+
+    if (window->scrollbar.dragging) {
+        if (!mouse_left_pressed()) {
+            window->scrollbar.dragging = false;
+            return;
+        }
+
+        int new_thumb_y = mouse.y - window->scrollbar.drag_offset;
+
+        if (new_thumb_y < y) {
+            new_thumb_y = y;
+        }
+
+        if (new_thumb_y > y + max_thumb_y) {
+            new_thumb_y = y + max_thumb_y;
+        }
+
+        if (max_thumb_y > 0) {
+            scroll = ((new_thumb_y - y) * max_scroll) / max_thumb_y;
+        }
+
+        if (scroll < 0) {
+            scroll = 0;
+        }
+
+        if (scroll > max_scroll) {
+            scroll = max_scroll;
+        }
+
+        return;
+    }
+
+    if (mouse_in_scrollbar && !mouse_in_thumb && mouse_left_clicked()) {
+        if (mouse.y < thumb_y) {
+            scroll -= visible_lines;
+        }
+        else {
+            scroll += visible_lines;
+        }
+
+        if (scroll < 0) {
+            scroll = 0;
+        }
+
+        if (scroll > max_scroll) {
+            scroll = max_scroll;
+        }
+    }
 }

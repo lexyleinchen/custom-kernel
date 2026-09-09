@@ -1,7 +1,7 @@
 #include "os_mouse.h"
 #include "graphics.h"
 
-#include "../kernel/mouse.h"
+#include "../kernel/inputs/mouse.h"
 
 static const char* cursor[] = {
     "##..............",
