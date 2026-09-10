@@ -12,14 +12,22 @@ The project currently includes work on areas such as:
 
 * Custom kernel development
 * Hardware and device communication
-* PS/2 keyboard and mouse input
+* PS/2 controller support
+* PS/2 keyboard input and scancodes
+* PS/2 mouse input and movement
 * Framebuffer graphics
 * Basic graphical OS components
+* Desktop and taskbar
 * Terminal functionality
-* Taskbar and desktop components
+* Application system and app registry
+* Window/UI system
 * Memory and system management
 * Low-level C/C++ development
 * Custom build systems and tooling
+* PCI device support
+* IDE/storage support
+* USB subsystem
+* Work/task scheduling system
 
 PrintOS is an ongoing project and is intended primarily for experimentation, learning, and development.
 
