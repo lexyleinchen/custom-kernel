@@ -126,11 +126,26 @@ static void gpt_scan(BlockDevice* device) {
     kernel_log("gpt partition size %u", partition_size);
 }
 
+static void partition_clear_registered_devices(void) {
+    for (uint32_t i = 0; i < 4; i++) {
+        if (!partition_registered[i]) {
+            continue;
+        }
+
+        block_unregister_device(&partition_devices[i]);
+        partition_registered[i] = 0;
+        partition_data[i].parent = 0;
+        partition_data[i].start_lba = 0;
+        partition_data[i].sector_count = 0;
+    }
+}
+
 void partition_scan(BlockDevice* device) {
     if (!device) {
         return;
     }
 
+    partition_clear_registered_devices();
     kernel_log("scanning disk...");
     uint8_t sector[MBR_SECTOR_SIZE];
 
@@ -262,8 +277,8 @@ int partition_create_mbr_partition(BlockDevice* device, uint32_t partition_numbe
     return 1;
 }
 
-int partition_create_mbr_partition_size(BlockDevice* device, uint32_t size_mib, uint8_t type) {
-    if (!device || size_mib == 0) {
+int partition_create_mbr_partition_size(BlockDevice* device, uint32_t size_mib, uint8_t type, uint32_t* created_partition) {
+    if (!device || size_mib == 0 || !created_partition) {
         return 0;
     }
 
@@ -289,7 +304,10 @@ int partition_create_mbr_partition_size(BlockDevice* device, uint32_t size_mib, 
         }
 
         if (partition.type == 0 || partition.sector_count == 0) {
-            return partition_create_mbr_partition(device, i, start_lba, sectors, type);
+            if (partition_create_mbr_partition(device, i, start_lba, sectors, type)) {
+                *created_partition = i;
+                return 1;
+            }
         }
     }
 
@@ -334,7 +352,7 @@ int partition_delete(BlockDevice* device, uint32_t partition_number) {
 }
 
 int partition_get_mbr_partition(BlockDevice* device, uint32_t partition_number, MBRPartitionInfo* partition) {
-    if (!device) {
+    if (!device || !partition) {
         return 0;
     }
 
@@ -420,4 +438,41 @@ int partition_has_mbr(BlockDevice* device) {
     }
 
     return 1;
+}
+
+BlockDevice* partition_get_device(BlockDevice* device, uint32_t partition_number) {
+    if (!device) {
+        return 0;
+    }
+
+    if (partition_number >= MBR_PARTITION_COUNT) {
+        return 0;
+    }
+
+    MBRPartitionInfo partition;
+
+    if (!partition_get_mbr_partition(device, partition_number, &partition)) {
+        return 0;
+    }
+
+    if (partition.type == 0 || partition.sector_count == 0) {
+        return 0;
+    }
+
+    partition_data[partition_number].parent = device;
+    partition_data[partition_number].start_lba = partition.start_lba;
+    partition_data[partition_number].sector_count = partition.sector_count;
+    partition_devices[partition_number].sector_count = partition.sector_count;
+    partition_devices[partition_number].sector_size = device->sector_size;
+    partition_devices[partition_number].type = BLOCK_DEVICE_PARTITION;
+    partition_devices[partition_number].read = partition_read;
+    partition_devices[partition_number].write = partition_write;
+    partition_devices[partition_number].driver_data = &partition_data[partition_number];
+
+    if (!partition_registered[partition_number]) {
+        block_register_device(&partition_devices[partition_number]);
+        partition_registered[partition_number] = 1;
+    }
+
+    return &partition_devices[partition_number];
 }

@@ -58,6 +58,28 @@ void block_register_device(BlockDevice* device) {
     block_device_count++;
 }
 
+int block_unregister_device(BlockDevice* device) {
+    if (!device) {
+        return 0;
+    }
+    
+    for (uint32_t i = 0; i < block_device_count; i++) {
+        if (block_devices[i] != device) {
+            continue;
+        }
+
+        for (uint32_t j = i; j + 1 < block_device_count; j++) {
+            block_devices[j] = block_devices[j + 1];
+        }
+
+        block_device_count--;
+        block_devices[block_device_count] = 0;
+        return 1;
+    }
+
+    return 0;
+}
+
 uint32_t block_get_device_count(void) {
     return block_device_count;
 }

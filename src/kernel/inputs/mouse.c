@@ -54,14 +54,14 @@ void mouse_get_state(MouseState* state) {
 
 static int ps2_mouse_command(uint8_t command) {
     if (!ps2_mouse_write(command)) {
-        kernel_log("ps2_mouse failed to send command.");
+        kernel_log("ps2 mouse failed to send command.");
         return 0;
     }
 
     uint8_t response;
 
     if (!ps2_mouse_read(&response)) {
-        kernel_log("ps2_mouse no command response.");
+        kernel_log("ps2 mouse no command response.");
         return 0;
     }
 
@@ -70,11 +70,11 @@ static int ps2_mouse_command(uint8_t command) {
     }
 
     if (response == PS2_MOUSE_RESEND) {
-        kernel_log("ps2_mouse device requested resend.");
+        kernel_log("ps2 mouse device requested resend.");
         return 0;
     }
 
-    kernel_log("ps2_mouse unexpected response %u", (uint32_t)response);
+    kernel_log("ps2 mouse unexpected response %u", (uint32_t)response);
     return 0;
 }
 
@@ -82,45 +82,46 @@ int ps2_mouse_init(void) {
     kernel_log("initializing ps2 mouse...");
 
     if (!ps2_mouse_write(PS2_MOUSE_RESET)) {
+        kernel_log("ps2 mouse reset failed.");
         return 0;
     }
 
     uint8_t response;
 
     if (!ps2_mouse_read(&response)) {
-        kernel_log("ps2_mouse reset response missing.");
+        kernel_log("ps2 mouse reset response missing.");
         return 0;
     }
 
     if (response != PS2_MOUSE_ACK) {
-        kernel_log("ps2_mouse reset was not acknowledged.");
+        kernel_log("ps2 mouse reset was not acknowledged.");
         return 0;
     }
 
     if (!ps2_mouse_read(&response)) {
-        kernel_log("ps2_mouse self-test response missing.");
+        kernel_log("ps2 mouse self-test response missing.");
         return 0;
     }
 
     if (response != 0xAA) {
-        kernel_log("ps2_mouse self-test failed %u", (uint32_t)response);
+        kernel_log("ps2 mouse self-test failed %u", (uint32_t)response);
         return 0;
     }
 
     if (!ps2_mouse_read(&response)) {
-        kernel_log("ps2_mouse device id missing.");
+        kernel_log("ps2 mouse device id missing.");
         return 0;
     }
 
-    kernel_log("ps2_mouse device id %u", (uint32_t)response);
+    kernel_log("ps2 mouse device id %u", (uint32_t)response);
 
     if (!ps2_mouse_command(PS2_MOUSE_SET_DEFAULTS)) {
-        kernel_log("ps2_mouse failed to set defaults.");
+        kernel_log("ps2 mouse failed to set defaults.");
         return 0;
     }
 
     if (!ps2_mouse_command(PS2_MOUSE_ENABLE)) {
-        kernel_log("ps2_mouse failed to enable reporting.");
+        kernel_log("ps2 mouse failed to enable reporting.");
         return 0;
     }
 
@@ -133,7 +134,7 @@ static void ps2_mouse_process_packet(void) {
     uint8_t flags = ps2_mouse_packet[0];
 
     if ((flags & 0x08) == 0) {
-        kernel_log("ps2_mouse invalid packet.");
+        kernel_log("ps2 mouse invalid packet.");
         return;
     }
 
@@ -149,18 +150,7 @@ static void ps2_mouse_process_packet(void) {
 }
 
 void ps2_mouse_poll(void) {
-    while (1) {
-        uint8_t status;
-        __asm__ volatile ("inb %1, %0" : "=a"(status) : "Nd"((uint16_t)0x64));
-
-        if ((status & 0x01) == 0) {
-            break;
-        }
-
-        if ((status & 0x20) == 0) {
-            break;
-        }
-
+    while (ps2_mouse_data_available()) {
         uint8_t data;
 
         if (!ps2_mouse_read(&data)) {

@@ -354,3 +354,8 @@ void update_scrollbar(Window* window, int x, int y , int width, int height, int 
         }
     }
 }
+
+void font_draw_progressbar(int x, int y, int width, int height, int filled, uint32_t background_color, uint32_t fill_color) {
+    graphics_rectangle(x, y, width, height, background_color);
+    graphics_rectangle(x, y, filled, height, fill_color);
+}

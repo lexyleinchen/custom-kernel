@@ -5,17 +5,25 @@
 #include "../../os/ui.h"
 #include "../../os/graphics.h"
 
+#include "../../kernel/storage/storage.h"
 #include "../../kernel/storage/block.h"
 #include "../../kernel/storage/partition/partition.h"
+#include "../../kernel/storage/partition/filesystem/fat32/fat32.h"
+#include "../../kernel/storage/partition/filesystem/filesystem.h"
+#include "../../kernel/core/log.h"
 
 namespace diskmanager {
     static Window window;
     static BlockDevice* selected_disk = nullptr;
     static int selected_partition = -1;
+    static FAT32FormatWork format_work;
+    static BlockDevice* formatting_partition = nullptr;
+    static bool formatting = false;
 
     enum Screen {
         SCREEN_MAIN,
         SCREEN_CREATE_PARTITION,
+        SCREEN_FORMATTING,
         SCREEN_CONFIRM
     };
 
@@ -153,10 +161,29 @@ namespace diskmanager {
 
         if (graphics_button(content_x + 20, content_y + 260, 140, 35, 0xFF606060, "Create", 0xFFFFFFFF)) {
             if (selected_disk != nullptr) {
-                if (partition_create_mbr_partition_size(selected_disk, create_size_mib, 0x0C)) {
+                uint32_t created_partition;
+
+                if (partition_create_mbr_partition_size(selected_disk, create_size_mib, 0x0C, &created_partition)) {
                     partition_scan(selected_disk);
-                    selected_partition = -1;
-                    screen = SCREEN_MAIN;
+                    BlockDevice* partition = partition_get_device(selected_disk, created_partition);
+
+                    if (!partition) {
+                        kernel_log("failed to get created partition.");
+                        return;
+                    }
+
+                    formatting_partition = partition;
+
+                    if (!fat32_format_async(partition, &format_work)) {
+                        kernel_log("failed to format partition as fat32.");
+                        formatting_partition = nullptr;
+                        formatting = false;
+                        return;
+                    }
+
+                    formatting = true;
+                    screen = SCREEN_FORMATTING;
+                    kernel_log("fat32 formatting stared.");
                 }
             }
         }
@@ -164,6 +191,18 @@ namespace diskmanager {
         if (graphics_button(content_x + 185, content_y + 260, 140, 35, 0xFF606060, "Cancel", 0xFFFFFFFF)) {
             screen = SCREEN_MAIN;
         }
+    }
+
+    static void draw_formatting(Window* window) {
+        int content_x = ui_window_content_x(window);
+        int content_y = ui_window_content_y(window);
+        font_draw_text(content_x + 20, content_y + 20, "Formatting partition", 0xFFFFFFFF);
+        uint32_t percent = fat32_format_get_percent(&format_work);
+        font_draw_text(content_x + 20, content_y + 80, "Progress:", 0xFFFFFFFF);
+        font_draw_number(content_x + 145, content_y + 80, percent, 0xFFFFFFFF);
+        font_draw_text(content_x + 180, content_y + 80, "%", 0xFFFFFFFF);
+        font_draw_progressbar(content_x + 20, content_y + 125, 500, 25, (500 * percent) / 100, 0xFF404040, 0xFF408040);
+        font_draw_text(content_x + 20, content_y + 175, "Please wait...", 0xFFAAAAAA);
     }
 
     static void draw_confirm(Window* window) {
@@ -190,7 +229,13 @@ namespace diskmanager {
                 }
                 else if (confirm_action == CONFIRM_DELETE_PARTITION) {
                     if (selected_partition >= 0) {
-                        partition_delete(selected_disk, selected_partition);
+                        BlockDevice* partition = partition_get_device(selected_disk, (uint32_t)selected_partition);
+
+                        if (partition) {
+                            storage_unmount_partition(partition);
+                        }
+
+                        partition_delete(selected_disk, (uint32_t)selected_partition);
                         selected_partition = -1;
                         partition_scan(selected_disk);
                     }
@@ -212,6 +257,9 @@ namespace diskmanager {
         else if (screen == SCREEN_CREATE_PARTITION) {
             draw_create_partition(window);
         }
+        else if (screen == SCREEN_FORMATTING) {
+            draw_formatting(window);
+        }
         else if (screen == SCREEN_CONFIRM) {
             draw_confirm(window);
         }
@@ -219,6 +267,49 @@ namespace diskmanager {
 
     static void update_content(Window* window) {
         (void)window;
+
+        if (!formatting) {
+            return;
+        }
+
+        FAT32FormatStatus status = fat32_format_get_status(&format_work);
+
+        if (status == FAT32_FORMAT_RUNNING) {
+            return;
+        }
+
+        if (status == FAT32_FORMAT_FAILED) {
+            kernel_log("fat32 formatting failed.");
+            formatting = false;
+            formatting_partition = nullptr;
+            screen = SCREEN_MAIN;
+            return;
+        }
+
+        if (status == FAT32_FORMAT_COMPLETE) {
+            kernel_log("fat32 formatting complete.");
+
+            if (!formatting_partition) {
+                kernel_log("formatting partition is null.");
+                formatting = false;
+                screen = SCREEN_MAIN;
+                return;
+            }
+
+            if (!storage_mount_partition(formatting_partition)) {
+                kernel_log("failed to add filesystem to storage.");
+                formatting = false;
+                formatting_partition = nullptr;
+                screen = SCREEN_MAIN;
+                return;
+            }
+
+            kernel_log("filesystem added to storage.");
+            formatting = false;
+            formatting_partition = nullptr;
+            selected_partition = -1;
+            screen = SCREEN_MAIN;
+        }
     } 
 
     void init() {

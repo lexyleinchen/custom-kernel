@@ -52,4 +52,6 @@ void draw_scrollbar(int x, int y, int width, int height, int total_lines, int vi
 
 void update_scrollbar(Window* window, int x, int y , int width, int height, int total_lines, int visible_lines, int& scroll);
 
+void font_draw_progressbar(int x, int y, int width, int height, int filled, uint32_t background_color, uint32_t fill_color);
+
 #endif // UI_H

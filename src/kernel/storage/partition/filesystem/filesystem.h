@@ -31,6 +31,14 @@ int filesystem_mount(BlockDevice* device, Filesystem* filesystem);
 
 int filesystem_read_directory(Filesystem* filesystem, uint32_t cluster, FilesystemEntry* entries, uint32_t max_entries, uint32_t* entry_count);
 
+uint32_t filesystem_get_count(void);
+
+Filesystem* filesystem_get(uint32_t index);
+
+int filesystem_create_directory(Filesystem* filesystem, uint32_t parent_cluster, const char* name);
+
+int filesystem_create_file(Filesystem* filesystem, uint32_t parent_cluster, const char* name);
+
 #ifdef __cplusplus
 }
 #endif

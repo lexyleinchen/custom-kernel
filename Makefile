@@ -38,6 +38,9 @@ build/kernel.o: src/kernel/kernel.c | build
 build/log.o: src/kernel/core/log.c | build
 	$(CC) $(CFLAGS) -Isrc/kernel -c $< -o $@
 
+build/work.o: src/kernel/core/work.c | build
+	$(CC) $(CFLAGS) -Isrc/kernel -c $< -o $@
+
 build/framebuffer.o: src/kernel/framebuffer/framebuffer.c | build
 	$(CC) $(CFLAGS) -Isrc/kernel -c $< -o $@
 
@@ -48,6 +51,12 @@ build/storage.o: src/kernel/storage/storage.c | build
 	$(CC) $(CFLAGS) -Isrc/kernel -c $< -o $@
 
 build/partition.o: src/kernel/storage/partition/partition.c | build
+	$(CC) $(CFLAGS) -Isrc/kernel -c $< -o $@
+
+build/filesystem.o: src/kernel/storage/partition/filesystem/filesystem.c | build
+	$(CC) $(CFLAGS) -Isrc/kernel -c $< -o $@
+
+build/fat32.o: src/kernel/storage/partition/filesystem/fat32/fat32.c | build
 	$(CC) $(CFLAGS) -Isrc/kernel -c $< -o $@
 
 build/multiboot.o: src/kernel/boot/multiboot.c | build
@@ -66,6 +75,9 @@ build/ahci.o: src/kernel/drivers/ahci/ahci.c | build
 	$(CC) $(CFLAGS) -Isrc/kernel -c $< -o $@
 
 build/ide.o: src/kernel/drivers/ide/ide.c | build
+	$(CC) $(CFLAGS) -Isrc/kernel -c $< -o $@
+
+build/keyboard.o: src/kernel/inputs/keyboard.c | build
 	$(CC) $(CFLAGS) -Isrc/kernel -c $< -o $@
 
 build/mouse.o: src/kernel/inputs/mouse.c | build
@@ -99,16 +111,20 @@ build/%.o: src/%.cpp
 $(KERNEL): build/boot.o \
 		build/kernel.o \
 		build/log.o \
+		build/work.o \
 		build/framebuffer.o \
 		build/block.o \
 		build/storage.o \
 		build/partition.o \
+		build/filesystem.o \
+		build/fat32.o \
 		build/multiboot.o \
 		build/ps2.o \
 		build/pci.o \
 		build/usb.o \
 		build/ahci.o \
 		build/ide.o \
+		build/keyboard.o \
 		build/mouse.o \
 		build/os.o \
 		build/graphics.o \

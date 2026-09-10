@@ -369,6 +369,30 @@ static const uint8_t font_plus[5] = {
     0b00100
 };
 
+static const uint8_t font_percent[5] = {
+    0b11001,
+    0b10010,
+    0b00100,
+    0b01001,
+    0b10011
+};
+
+static const uint8_t font_square_bracket_open[5] = {
+    0b01111,
+    0b01000,
+    0b01000,
+    0b01000,
+    0b01111
+};
+
+static const uint8_t font_square_bracket_close[5] = {
+    0b11110,
+    0b00010,
+    0b00010,
+    0b00010,
+    0b11110
+};
+
 static const uint8_t font_unknown[5] = {
     0b11111,
     0b10001,
@@ -428,6 +452,9 @@ static const uint8_t* get_character(char character) {
         case '_': return font_underscore;
         case '-': return font_minus;
         case '+': return font_plus;
+        case '%': return font_percent;
+        case '[': return font_square_bracket_open;
+        case ']': return font_square_bracket_close;
         default:  return font_unknown; // Return unknown character for unsupported characters
     }
 }

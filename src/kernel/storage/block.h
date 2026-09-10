@@ -43,6 +43,8 @@ int block_write(BlockDevice* device, uint64_t lba, uint32_t count, const void* b
 
 void block_register_device(BlockDevice* device);
 
+int block_unregister_device(BlockDevice* device);
+
 uint32_t block_get_device_count(void);
 
 BlockDevice* block_get_device(uint32_t index);

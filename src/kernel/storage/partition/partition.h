@@ -37,7 +37,7 @@ int partition_create_mbr(BlockDevice* device);
 
 int partition_create_mbr_partition(BlockDevice* device, uint32_t partition_number, uint32_t start_lba, uint32_t sector_count, uint8_t type);
 
-int partition_create_mbr_partition_size(BlockDevice* device, uint32_t size_mib, uint8_t type);
+int partition_create_mbr_partition_size(BlockDevice* device, uint32_t size_mib, uint8_t type, uint32_t* created_partition);
 
 int partition_delete(BlockDevice* device, uint32_t partition_number);
 
@@ -46,6 +46,8 @@ int partition_get_mbr_partition(BlockDevice* device, uint32_t partition_number, 
 int partition_find_free_space(BlockDevice* device, uint32_t requested_sectors, uint32_t* start_lba);
 
 int partition_has_mbr(BlockDevice* device);
+
+BlockDevice* partition_get_device(BlockDevice* device, uint32_t partition_number);
 
 #ifdef __cplusplus
 }

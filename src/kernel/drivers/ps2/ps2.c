@@ -1,4 +1,5 @@
 #include "ps2.h"
+#include "../../inputs/keyboard.h"
 #include "../../inputs/mouse.h"
 #include "../../core/log.h"
 
@@ -13,6 +14,7 @@
 #define PS2_COMMAND_DISABLE_MOUSE 0xA7
 #define PS2_COMMAND_ENABLE_MOUSE 0xA8
 #define PS2_COMMAND_WRITE_MOUSE 0xD4
+#define PS2_COMMAND_ENABLE_KEYBOARD 0xAE
 #define PS2_COMMAND_DISABLE_KEYBOARD 0xAD
 #define PS2_CONFIG_MOUSE_IRQ 0x02
 #define PS2_CONFIG_MOUSE_CLOCK 0x20
@@ -92,6 +94,42 @@ int ps2_mouse_read(uint8_t* value) {
     return ps2_read_data(value);
 }
 
+int ps2_mouse_data_available(void) {
+    uint8_t status = inb(PS2_STATUS_PORT);
+
+    if ((status & PS2_STATUS_OUTPUT_FULL) == 0) {
+        return 0;
+    }
+
+    if ((status & PS2_STATUS_AUX_DATA) == 0) {
+        return 0;
+    }
+
+    return 1;
+}
+
+int ps2_keyboard_write(uint8_t value) {
+    return ps2_write_data(value);
+}
+
+int ps2_keyboard_read(uint8_t* value) {
+    return ps2_read_data(value);
+}
+
+int ps2_keyboard_data_available(void) {
+    uint8_t status = inb(PS2_STATUS_PORT);
+
+    if ((status & PS2_STATUS_OUTPUT_FULL) == 0) {
+        return 0;
+    }
+
+    if (status & PS2_STATUS_AUX_DATA) {
+        return 0;
+    }
+
+    return 1;
+}
+
 static int ps2_read_config(uint8_t* config) {
     if (!ps2_write_command(PS2_COMMAND_READ_CONFIG)) {
         return 0;
@@ -136,7 +174,13 @@ static int ps2_controller_init(void) {
         return 0;
     }
 
+    if (!ps2_write_command(PS2_COMMAND_ENABLE_KEYBOARD)) {
+        kernel_log("ps2 failed to enable keyboard.");
+        return 0;
+    }
+
     if (!ps2_write_command(PS2_COMMAND_ENABLE_MOUSE)) {
+        kernel_log("ps2 failed to enable mouse.");
         return 0;
     }
 
@@ -164,6 +208,11 @@ void ps2_init(void) {
         return;
     }
 
+    if (!ps2_keyboard_init()) {
+        kernel_log("ps2 keyboard initialization failed.");
+        return;
+    }
+
     if (!ps2_mouse_init()) {
         kernel_log("ps2 mouse initialization failed.");
         return;
@@ -173,5 +222,6 @@ void ps2_init(void) {
 }
 
 void ps2_poll(void) {
+    ps2_keyboard_poll();
     ps2_mouse_poll();
 }
